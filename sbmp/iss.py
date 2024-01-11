@@ -318,11 +318,101 @@ int main()
 
 '''
 
+rsa = '''
+#include <iostream>
+#include <time.h>
+using namespace std;
+
+bool isPrime(int num) {
+    if (num <= 1) {
+        return false;
+    }
+    for (int i = 2; i * i <= num; ++i) {
+        if (num % i == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int generateRandomPrime(int range) {
+    int randomNum = rand() % range + 1;
+
+    while (!isPrime(randomNum)) {
+        randomNum = rand() % range + 1;
+    }
+
+    return randomNum;
+}
+
+int gcd(int a, int b){
+    if(b==0){
+        return a;
+    }
+    return gcd(b, a%b);
+}
+
+int main(){
+    srand(time(0));
+
+    int p = generateRandomPrime(100);
+    int q = generateRandomPrime(100);
+
+    cout << "Step 1:" << endl;
+    cout << "Random Prime Number p: " << p << endl;
+    cout << "Random Prime Number q: " << q << endl;
+
+    cout << endl;
+
+    cout << "Step 2:" << endl;
+    int n = p*q;
+    cout << "Modulus of Encryption and Decryption: " << n << endl;
+
+    cout << endl;
+    cout << "Step 3: " << endl;
+    int phiN = (p-1)*(q-1);
+    int e=0;
+    for(int i=2; i<phiN ; i++){
+        if(gcd(i,phiN) == 1){
+            e = i;
+            break;
+        }
+    }
+    cout << "Value of e: " << e << endl;
+     cout << endl;
+    cout << "Step 4:" << endl;
+    cout << "Public Key <e, n>: " << "<" << e << ", " << n << ">" << endl;
+
+    cout << endl;
+
+    int m; // Plain Text
+    cout << "Enter plain text message (m) less than (n): ";
+    cin >> m;
+
+    cout << "Step 5:" << endl;
+    int encrypted = (m^e)%n;
+    cout << "Encrypted Text of (m): " << encrypted << endl;
+
+    cout << endl;
+    cout << "Step 6:" << endl;
+    int d=(e^(phiN))%phiN;
+    cout << "Private Key <d, n>: " << "<" << d << ", " << n << ">" << endl;
+
+
+     cout << endl;
+    cout << "Step 7:" << endl;
+    int m2 = (encrypted^d)%n;
+    cout << "Decrypted Message: " <<  m2 << endl;
+
+}
+'''
+
 iss_codes = {
     "ceaser_cipher.cpp": ceaser_cipher,
     "polyalphabetic_cipher.cpp": polyalphabetic_cipher,
     "row_column_transposition.cpp": row_column_transposition,
-    "diffie_hellman.cpp": diffie_hellman
+    "diffie_hellman.cpp": diffie_hellman,
+    "rsa.cpp": rsa
 }
 
 def iss_():
