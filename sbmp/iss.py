@@ -320,39 +320,77 @@ int main()
 
 rsa = '''
 #include <iostream>
+#include <string>
 #include <time.h>
+#include <sstream>
 using namespace std;
 
-bool isPrime(int num) {
-    if (num <= 1) {
+bool isPrime(int num)
+{
+    if (num <= 1)
+    {
         return false;
     }
-    for (int i = 2; i * i <= num; ++i) {
-        if (num % i == 0) {
+    for (int i = 2; i * i <= num; ++i)
+    {
+        if (num % i == 0)
+        {
             return false;
         }
     }
     return true;
 }
 
-int generateRandomPrime(int range) {
+int generateRandomPrime(int range)
+{
     int randomNum = rand() % range + 1;
 
-    while (!isPrime(randomNum)) {
+    while (!isPrime(randomNum))
+    {
         randomNum = rand() % range + 1;
     }
 
     return randomNum;
 }
 
-int gcd(int a, int b){
-    if(b==0){
+int gcd(int a, int b)
+{
+    if (b == 0)
+    {
         return a;
     }
-    return gcd(b, a%b);
+    return gcd(b, a % b);
 }
 
-int main(){
+int pow(int a, int b)
+{
+    int res = 1;
+    while (b > 0)
+    {
+        if (b & 1)
+        {
+            res = res * a;
+        }
+        a = a * a;
+        b = b >> 1;
+    }
+    return res;
+}
+int power(int base, int exponent, int mod)
+{
+    int result = 1;
+    base = base % mod;
+    while (exponent > 0)
+    {
+        if (exponent & 1)
+            result = (result * base) % mod;
+        base = (base * base) % mod;
+        exponent >>= 1;
+    }
+    return result;
+}
+int main()
+{
     srand(time(0));
 
     int p = generateRandomPrime(100);
@@ -365,45 +403,68 @@ int main(){
     cout << endl;
 
     cout << "Step 2:" << endl;
-    int n = p*q;
+    int n = p * q;
     cout << "Modulus of Encryption and Decryption: " << n << endl;
 
     cout << endl;
     cout << "Step 3: " << endl;
-    int phiN = (p-1)*(q-1);
-    int e=0;
-    for(int i=2; i<phiN ; i++){
-        if(gcd(i,phiN) == 1){
+    int phiN = (p - 1) * (q - 1);
+    int e = 0;
+    for (int i = 2; i < phiN; i++)
+    {
+        if (gcd(i, phiN) == 1)
+        {
             e = i;
             break;
         }
     }
     cout << "Value of e: " << e << endl;
-     cout << endl;
+    cout << endl;
     cout << "Step 4:" << endl;
-    cout << "Public Key <e, n>: " << "<" << e << ", " << n << ">" << endl;
+    cout << "Public Key <e, n>: "
+         << "<" << e << ", " << n << ">" << endl;
 
     cout << endl;
 
-    int m; // Plain Text
+    string m;
     cout << "Enter plain text message (m) less than (n): ";
-    cin >> m;
+    getline(cin, m);
 
-    cout << "Step 5:" << endl;
-    int encrypted = (m^e)%n;
+    string encrypted;
+    for (char c : m)
+    {
+        int encryptedChar = power(c, e, n);
+        encrypted += to_string(encryptedChar) + " ";
+    }
     cout << "Encrypted Text of (m): " << encrypted << endl;
 
     cout << endl;
     cout << "Step 6:" << endl;
-    int d=(e^(phiN))%phiN;
+    int d = 0;
+    for (int i = 2; i < phiN; i++)
+    {
+        if ((i * e) % phiN == 1)
+        {
+            d = i;
+            break;
+        }
+    }
     cout << "Private Key <d, n>: " << "<" << d << ", " << n << ">" << endl;
 
-
-     cout << endl;
+    cout << endl;
     cout << "Step 7:" << endl;
-    int m2 = (encrypted^d)%n;
-    cout << "Decrypted Message: " <<  m2 << endl;
-
+    string decrypted;
+    stringstream ss(encrypted);
+    string temp;
+    while (getline(ss, temp, ' '))
+    {
+        if (!temp.empty())
+        {
+            int decryptedChar = power(stoi(temp), d, n);
+            decrypted += char(decryptedChar);
+        }
+    }
+    cout << "Decrypted Message: " << decrypted << endl;
 }
 '''
 
