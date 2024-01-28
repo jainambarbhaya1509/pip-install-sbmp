@@ -320,152 +320,102 @@ int main()
 
 rsa = '''
 #include <iostream>
-#include <string>
-#include <time.h>
-#include <sstream>
+#include <cmath>
 using namespace std;
 
-bool isPrime(int num)
-{
-    if (num <= 1)
-    {
-        return false;
-    }
-    for (int i = 2; i * i <= num; ++i)
-    {
-        if (num % i == 0)
-        {
-            return false;
-        }
-    }
-    return true;
+// Function to check if a number is prime or not
+bool isPrime(int n) {
+   if (n <= 1) {
+       return false;
+   }
+   for (int i = 2; i <= sqrt(n); i++) {
+       if (n % i == 0) {
+           return false;
+       }
+   }
+   return true;
 }
 
-int generateRandomPrime(int range)
-{
-    int randomNum = rand() % range + 1;
-
-    while (!isPrime(randomNum))
-    {
-        randomNum = rand() % range + 1;
-    }
-
-    return randomNum;
+// Function to find GCD of two numbers
+int gcd(int a, int b) {
+   if (b == 0) {
+       return a;
+   }
+   return gcd(b, a % b);
 }
 
-int gcd(int a, int b)
-{
-    if (b == 0)
-    {
-        return a;
-    }
-    return gcd(b, a % b);
+// Function to perform modular exponentiation
+int modPow(int base, int exponent, int modulus) {
+   int result = 1;
+   base = base % modulus;
+   while (exponent > 0) {
+       if (exponent % 2 == 1) {
+           result = (result * base) % modulus;
+       }
+       base = (base * base) % modulus;
+       exponent = exponent / 2;
+   }
+   return result;
 }
 
-int pow(int a, int b)
-{
-    int res = 1;
-    while (b > 0)
-    {
-        if (b & 1)
-        {
-            res = res * a;
-        }
-        a = a * a;
-        b = b >> 1;
-    }
-    return res;
+int main() {
+   // Step 1: Choose two prime numbers
+   int p = 17, q = 11;
+
+   // Step 2: Compute n and phi
+   int n = p * q;
+   int phi = (p - 1) * (q - 1);
+
+   // Step 3: Choose an integer e such that 1 < e < phi and gcd(e, phi) = 1
+   int e = 2;
+   while (e < phi) {
+       if (gcd(e, phi) == 1) {
+           break;
+       }
+       e++;
+   }
+
+   // Step 4: Compute the secret key d
+   int d = 1;
+   while ((d * e) % phi != 1) {
+       d++;
+   }
+
+   // Step 5: Print the public and private keys
+   cout << "Public key: {" << e << ", " << n << "}" << endl;
+   cout << "Private key: {" << d << ", " << n << "}" << endl;
+
+   // Step 6: Encrypt the message
+   string message = "hello";
+   int encrypted[message.length()];
+   for (int i = 0; i < message.length(); i++) {
+       int m = message[i];
+       int c = modPow(m, e, n);
+       encrypted[i] = c;
+   }
+
+   // Step 7: Decrypt the message
+   string decrypted;
+   for (int i = 0; i < message.length(); i++) {
+       int c = encrypted[i];
+       int m = modPow(c, d, n);
+       decrypted += static_cast<char>(m);
+   }
+
+   // Step 8: Print the encrypted and decrypted messages
+   cout << "Encrypted message: ";
+   for (int i = 0; i < message.length(); i++) {
+       cout << encrypted[i] << " ";
+   }
+   cout << endl;
+   cout << "Decrypted message: " << decrypted << endl;
+
+   return 0;
 }
-int power(int base, int exponent, int mod)
-{
-    int result = 1;
-    base = base % mod;
-    while (exponent > 0)
-    {
-        if (exponent & 1)
-            result = (result * base) % mod;
-        base = (base * base) % mod;
-        exponent >>= 1;
-    }
-    return result;
-}
-int main()
-{
-    srand(time(0));
+'''
 
-    int p = generateRandomPrime(100);
-    int q = generateRandomPrime(100);
-
-    cout << "Step 1:" << endl;
-    cout << "Random Prime Number p: " << p << endl;
-    cout << "Random Prime Number q: " << q << endl;
-
-    cout << endl;
-
-    cout << "Step 2:" << endl;
-    int n = p * q;
-    cout << "Modulus of Encryption and Decryption: " << n << endl;
-
-    cout << endl;
-    cout << "Step 3: " << endl;
-    int phiN = (p - 1) * (q - 1);
-    int e = 0;
-    for (int i = 2; i < phiN; i++)
-    {
-        if (gcd(i, phiN) == 1)
-        {
-            e = i;
-            break;
-        }
-    }
-    cout << "Value of e: " << e << endl;
-    cout << endl;
-    cout << "Step 4:" << endl;
-    cout << "Public Key <e, n>: "
-         << "<" << e << ", " << n << ">" << endl;
-
-    cout << endl;
-
-    string m;
-    cout << "Enter plain text message (m) less than (n): ";
-    getline(cin, m);
-
-    string encrypted;
-    for (char c : m)
-    {
-        int encryptedChar = power(c, e, n);
-        encrypted += to_string(encryptedChar) + " ";
-    }
-    cout << "Encrypted Text of (m): " << encrypted << endl;
-
-    cout << endl;
-    cout << "Step 6:" << endl;
-    int d = 0;
-    for (int i = 2; i < phiN; i++)
-    {
-        if ((i * e) % phiN == 1)
-        {
-            d = i;
-            break;
-        }
-    }
-    cout << "Private Key <d, n>: " << "<" << d << ", " << n << ">" << endl;
-
-    cout << endl;
-    cout << "Step 7:" << endl;
-    string decrypted;
-    stringstream ss(encrypted);
-    string temp;
-    while (getline(ss, temp, ' '))
-    {
-        if (!temp.empty())
-        {
-            int decryptedChar = power(stoi(temp), d, n);
-            decrypted += char(decryptedChar);
-        }
-    }
-    cout << "Decrypted Message: " << decrypted << endl;
-}
+des = '''
+!UNDER CONSTRUCTION!
 '''
 
 iss_codes = {
@@ -473,7 +423,8 @@ iss_codes = {
     "polyalphabetic_cipher.cpp": polyalphabetic_cipher,
     "row_column_transposition.cpp": row_column_transposition,
     "diffie_hellman.cpp": diffie_hellman,
-    "rsa.cpp": rsa
+    "rsa.cpp": rsa,
+    'des.cpp': des,
 }
 
 def iss_():
