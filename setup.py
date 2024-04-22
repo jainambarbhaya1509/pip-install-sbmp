@@ -10,7 +10,7 @@ classifiers = [
  
 setup(
   name='sbmp',
-  version='1.0.0',
+  version='2.3.0',
   description='SBMP',
   long_description=open('README.txt').read() + '\n\n' + open('CHANGELOG.txt').read(),
   url='',  
