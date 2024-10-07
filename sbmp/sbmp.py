@@ -604,6 +604,157 @@ SHA1:6c03ac0ea7241c3b2e2b7d54ff1db5f5539dc198:incorrect
 SHA256:203d3536bd62ad33ac70b7ea3d4f5e10b6d52ebd0cb7582841a053aebb7186a3:incorrect
 '''
 
+entropy='''
+import math
+
+str=input("Enter a string : ")
+strlen=len(str)
+dic_value={i:str.count(i) for i in str}
+print(dic_value)
+entropy=0
+for i in dic_value:
+	value=dic_value[i]/strlen
+	print("Probability of ",i," : ",value)
+	entropy+=value*math.log(value,2)
+
+print("Entropy Value",entropy*-1)
+'''
+
+arithmetic_Encoding='''
+# dic={'a':0.4,'g':0.2,'s':0.25,'t':0.1,'e':0.05}
+# dicnumalpha={0:'a',1:'g',2:'s',3:'t',4:'e'}
+# dicnumprob={0:0.4,1:0.2,2:0.25,3:0.1,4:0.05}
+# dic={'p': 0.4, 's': 0.25, 'o': 0.2, 't': 0.15}
+# dicnumalpha={0:'p',1:'s',2:'o',3:'t'}
+# dicnumprob={0:0.4,1:0.25,2:0.2,3:0.15}
+dic={}
+dicnumalpha={}
+dicnumprob={}
+n=int(input("Enter Number of Characters : "))
+for i in range(n):
+    char=input("Enter the Character : ")
+    prob=float(input("Enter The probability of Character : "))
+    dic[char]=prob
+    dicnumalpha[i]=char
+    dicnumprob[i]=prob
+print(dic)
+gc={}
+valuation={}
+val=0
+mul_list=[]
+for k,v in dic.items():
+    mul_list.append(v)
+    val=val+v
+    gc[k]=val
+str=input("Enter a string : ")
+def list_multiply(temp_mul,mul_list):
+    l1=[item * temp_mul for item in mul_list]
+    mul_list=l1
+    return mul_list
+def getIndexFromAlpha(temp_alpha):
+    for i in range(len(dicnumalpha)):
+        if dicnumalpha[i]==temp_alpha:
+            return i
+def getProbFromIndex(index):
+    for i in range(len(dicnumprob)):
+        if i==index:
+            if i-1==-1:
+                return 0
+            else:
+                return dicnumprob[i-1]
+def recreate_gc(start_index,lis):
+    gcval=start_index
+    for i in range(len(lis)):
+        valuation[dicnumalpha[i]]=[{"MIN":gcval,"MAX":gcval+lis[i]}]
+        gcval+=lis[i]
+        gc[dicnumalpha[i]]=gcval
+    for k,v in valuation.items():
+        print(k,v)
+    return gc
+def reset_dicnumprob(dic):
+    d1={}
+    i=0
+    for k,v in dic.items():
+        d1[i]=v
+        i+=1
+    return d1
+temp_mul=1 
+for i in range(len(str)-1):
+    temp_alpha=str[i]
+    temp_mul*=dic[temp_alpha]
+    lis=list_multiply(temp_mul,mul_list)
+    start_index=getProbFromIndex(getIndexFromAlpha(temp_alpha))
+    print("\\nFor iteration",i," and character ",temp_alpha)
+    recreate_gc(start_index,lis)
+    dicnumprob=reset_dicnumprob(gc)
+print("\\nArithmetic Encoding of word ",str,"is : ",valuation[str[len(str)-1]])
+'''
+
+huffman='''
+dic={'a': 35, 'b': 20, 'c': 10, 'd': 16, 'e': 8, 'f': 11}
+nums_list=[35, 20, 10, 16, 8, 11]
+n=len(nums_list)
+
+def sort(nums_list):
+    return sorted(nums_list)
+
+def add_first_two(nums_list):
+    sum=nums_list[0]+nums_list[1]
+    nums_list=nums_list[2:]
+    nums_list.append(sum)
+    # print(nums_list)
+    return nums_list
+    
+for i in range(n-1):
+    nums_list=sort(nums_list)
+    print("**",nums_list)
+    nums_list=add_first_two(nums_list)
+'''
+
+rle='''
+l1=[]
+s=input("Enter String : ")
+n = len(s)
+i = 0
+while i < n- 1:
+    count = 1
+    while (i < n - 1 and
+        s[i] == s[i + 1]):
+        count += 1
+        i += 1
+    i += 1
+    l1.append(str(count))
+    l1.append(s[i-1])
+
+res=""
+for i in l1:
+    res+=i
+    
+print(res)
+'''
+
+lzw='''
+s=input("Enter String : ")
+keys_dict = {}
+
+ind = 0
+inc = 1
+while True:
+    if not (len(s) >= ind+inc):
+        break
+    sub_str = s[ind:ind + inc]
+    print(sub_str,ind,inc)
+    if sub_str in keys_dict:
+        inc += 1
+    else:
+        keys_dict[sub_str] = 0
+        ind += inc
+        inc = 1
+        # print 'Adding %s' %sub_str
+
+print(list(keys_dict))
+'''
+
 iss_codes = {
     "ceaser_cipher.cpp": ceaser_cipher,
     "polyalphabetic_cipher.cpp": polyalphabetic_cipher,
@@ -615,9 +766,24 @@ iss_codes = {
     'rainbow_table.cpp': rainbow_table
 }
 
+itc_codes = {
+    'entropy.py': entropy,
+    'arithmetic_Encoding.py': arithmetic_Encoding,
+    'huffman.py': huffman,
+    'rle.py': rle,
+    'lzw.py': lzw
+}
+
 def iss_():
     for file,code in iss_codes.items():
         print(file)
     filename = input("Enter filename: ")
     with open(filename, 'w') as f:
         f.write(iss_codes[filename])
+        
+def itc_():
+    for file,code in itc_codes.items():
+        print(file)
+    filename = input("Enter filename: ")
+    with open(filename, 'w') as f:
+        f.write(itc_codes[filename])
