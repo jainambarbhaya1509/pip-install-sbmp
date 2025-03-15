@@ -2178,6 +2178,661 @@ class _RowAndColState extends State<RowAndCol> {
 
 '''
 
+singly_linked_list = '''
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+} *head = NULL;
+
+struct Node* temp;
+
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (!newNode) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void insertAtEnd(int data) {
+    struct Node* newNode = createNode(data);
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+    temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+}
+
+void insertAtStart(int data) {
+    struct Node* newNode = createNode(data);
+    newNode->next = head;
+    head = newNode;
+}
+
+void insertAtNPosition(int data, int position) {
+    if (position == 0) {
+        insertAtStart(data);
+        return;
+    }
+
+    struct Node* newNode = createNode(data);
+    temp = head;
+    for (int i = 0; temp != NULL && i < position - 1; i++) {
+        temp = temp->next;
+    }
+    
+    if (temp == NULL) { // Position is out of bounds
+        printf("Invalid position\n");
+        free(newNode);
+        return;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
+void deleteAtFirst() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    temp = head;
+    head = head->next;
+    free(temp);
+}
+
+void deleteAtEnd() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    if (head->next == NULL) {
+        free(head);
+        head = NULL;
+        return;
+    }
+    struct Node* prev = NULL;
+    temp = head;
+    while (temp->next != NULL) {
+        prev = temp;
+        temp = temp->next;
+    }
+    prev->next = NULL;
+    free(temp);
+}
+
+void deleteNPosition(int position) {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    if (position == 0) {
+        deleteAtFirst();
+        return;
+    }
+
+    temp = head;
+    struct Node* prev = NULL;
+
+    for (int i = 0; temp != NULL && i < position; i++) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Invalid position\n");
+        return;
+    }
+
+    prev->next = temp->next;
+    free(temp);
+}
+
+void display() {
+    temp = head;
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    insertAtEnd(1);
+    insertAtEnd(2);
+    insertAtEnd(3);
+    insertAtEnd(4);
+    insertAtEnd(5);
+    insertAtStart(5);
+    insertAtNPosition(15, 2);
+    deleteAtFirst();
+    deleteAtEnd();
+    deleteNPosition(1);
+    display();
+    return 0;
+}
+'''
+
+doubly_linked_list = '''
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node{
+    int data;
+    struct Node* next;
+    struct Node* prev;
+}*head=NULL;
+
+struct Node* temp;
+
+struct Node* createNode(int data)
+{
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data=data;
+    newNode->next=NULL;
+    newNode->prev=NULL;
+    return newNode;
+}
+
+void insertAtEnd(int data)
+{
+    struct Node* newNode = createNode(data);
+    if(head==NULL)
+    {
+     head=newNode;
+     return;
+    }
+    temp=head;
+    while(temp->next!=NULL)
+    {
+        temp=temp->next;
+    }
+    temp->next=newNode;
+    newNode->prev=temp;
+    newNode->next=NULL;
+}
+
+void insertAtStart(int data)
+{
+struct Node* newNode = createNode(data);
+if(head==NULL)
+    {
+     head=newNode;
+     return;
+    }
+newNode->next=head;
+newNode->prev=NULL;
+head->prev=newNode;
+head=newNode;
+}
+
+void insertAtNPosition(int data, int position){
+    struct Node* newNode = createNode(data);
+    temp=head;
+    for(int i=0; temp!=NULL && i<position-1; i++){
+        temp=temp->next;
+    }
+    newNode->next=temp->next;
+    newNode->prev=temp;
+    if(temp->next!=NULL){
+        temp->next->prev=newNode;
+    }
+    temp->next=newNode;
+}
+
+void deleteAtFirst(){
+    temp=head;
+    head=head->next;
+    head->prev=NULL;
+    free(temp);
+}
+
+void deleteAtEnd(){
+    temp=head;
+    while(temp->next!=NULL){
+        temp=temp->next;
+    }
+    temp->prev->next=NULL;
+    free(temp);
+}
+
+void deleteNPosition(int position){
+temp=head;
+for(int i=0; temp!=NULL && i<position; i++){
+    temp=temp->next;
+}
+temp->next->prev=temp->prev;
+temp->prev->next=temp->next;
+free(temp);
+}
+
+void display()
+{
+    temp=head;
+    while(temp!=NULL)
+    {
+        printf("%d -> ", temp->data);
+        temp=temp->next;
+    }
+    printf("NULL\n");
+}
+
+void displayBackward()
+{
+    temp=head;
+    while(temp->next!=NULL){
+        temp=temp->next;
+    }
+    while(temp!=NULL){
+        printf("%d -> ",temp->data);
+        temp=temp->prev;
+    }
+    printf("NULL");
+}
+
+int main()
+{
+    insertAtEnd(1);
+    insertAtEnd(2);
+    insertAtEnd(3);
+    insertAtEnd(4);
+    insertAtEnd(5);
+    insertAtStart(5);
+    insertAtNPosition(15,2);
+    deleteAtFirst();
+    deleteAtEnd();
+    deleteNPosition(1);
+    display();
+    displayBackward();
+}
+'''
+
+circular_linked_list = '''
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+} *head = NULL;
+
+struct Node* tail = NULL; 
+
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (!newNode) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void insertAtEnd(int data) {
+    struct Node* newNode = createNode(data);
+    if (head == NULL) {
+        head = newNode;
+        tail = newNode;
+        tail->next = head;
+        return;
+    }
+    tail->next = newNode;
+    tail = newNode;
+    tail->next = head;
+}
+
+void insertAtStart(int data) {
+    struct Node* newNode = createNode(data);
+    if (head == NULL) {
+        head = newNode;
+        tail = newNode;
+        tail->next = head;
+        return;
+    }
+    newNode->next = head;
+    head = newNode;
+    tail->next = head;
+}
+
+void insertAtNPosition(int data, int position) {
+    if (position == 0) {
+        insertAtStart(data);
+        return;
+    }
+
+    struct Node* newNode = createNode(data);
+    struct Node* temp = head;
+
+    for (int i = 0; i < position - 1 && temp->next != head; i++) {
+        temp = temp->next;
+    }
+
+    if (temp->next == head && position > 0) {
+        printf("Invalid position\n");
+        free(newNode);
+        return;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode;
+
+    if (temp == tail) {
+        tail = newNode;
+    }
+}
+
+void deleteAtFirst() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* temp = head;
+
+    if (head == tail) {
+        head = NULL;
+        tail = NULL;
+    } else {
+        head = head->next;
+        tail->next = head;
+    }
+
+    free(temp);
+}
+
+void deleteAtEnd() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    if (head == tail) {
+        free(head);
+        head = NULL;
+        tail = NULL;
+        return;
+    }
+    
+    struct Node* temp = head;
+    while (temp->next != tail) {
+        temp = temp->next;
+    }
+
+    free(tail);
+    tail = temp;
+    tail->next = head;
+}
+
+void deleteNPosition(int position) {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    if (position == 0) {
+        deleteAtFirst();
+        return;
+    }
+
+    struct Node* temp = head;
+    struct Node* prev = NULL;
+
+    for (int i = 0; i < position && temp->next != head; i++) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == head) {
+        printf("Invalid position\n");
+        return;
+    }
+
+    prev->next = temp->next;
+
+    if (temp == tail) {
+        tail = prev;
+    }
+
+    free(temp);
+}
+
+void display() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    
+    struct Node* temp = head;
+    do {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("%d(back to head)\n", head->data);
+}
+
+int main() {
+    insertAtEnd(1);
+    insertAtEnd(2);
+    insertAtEnd(3);
+    insertAtEnd(4);
+    insertAtEnd(5);
+    insertAtStart(10);
+    insertAtNPosition(15, 2);
+    display();
+
+    deleteAtFirst();
+    deleteAtEnd();
+    deleteNPosition(2);
+    display();
+
+    return 0;
+}
+'''
+
+doubly_circular_linked_list = '''
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
+
+struct Node* head = NULL;
+struct Node* tail = NULL;
+
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (!newNode) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = newNode->prev = NULL;
+    return newNode;
+}
+
+void insertAtEnd(int data) {
+    struct Node* newNode = createNode(data);
+    if (head == NULL) {
+        head = tail = newNode;
+        head->next = head->prev = head;
+        return;
+    }
+    newNode->prev = tail;
+    newNode->next = head;
+    tail->next = newNode;
+    head->prev = newNode;
+    tail = newNode;
+}
+
+void insertAtStart(int data) {
+    struct Node* newNode = createNode(data);
+    if (head == NULL) {
+        head = tail = newNode;
+        head->next = head->prev = head;
+        return;
+    }
+    newNode->next = head;
+    newNode->prev = tail;
+    tail->next = newNode;
+    head->prev = newNode;
+    head = newNode;
+}
+
+void insertAtNPosition(int data, int position) {
+    if (position == 0) {
+        insertAtStart(data);
+        return;
+    }
+
+    struct Node* newNode = createNode(data);
+    struct Node* temp = head;
+    
+    for (int i = 0; i < position - 1 && temp->next != head; i++) {
+        temp = temp->next;
+    }
+
+    if (temp->next == head && position > 0) {
+        printf("Invalid position\n");
+        free(newNode);
+        return;
+    }
+
+    newNode->next = temp->next;
+    newNode->prev = temp;
+    temp->next->prev = newNode;
+    temp->next = newNode;
+
+    if (temp == tail) {
+        tail = newNode;
+    }
+}
+
+void deleteAtFirst() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    
+    struct Node* temp = head;
+
+    if (head == tail) { 
+        free(head);
+        head = tail = NULL;
+        return;
+    }
+
+    head = head->next;
+    head->prev = tail;
+    tail->next = head;
+
+    free(temp);
+}
+
+void deleteAtEnd() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    
+    if (head == tail) { 
+        free(head);
+        head = tail = NULL;
+        return;
+    }
+
+    struct Node* temp = tail;
+    tail = tail->prev;
+    tail->next = head;
+    head->prev = tail;
+
+    free(temp);
+}
+
+void deleteNPosition(int position) {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    if (position == 0) {
+        deleteAtFirst();
+        return;
+    }
+
+    struct Node* temp = head;
+    
+    for (int i = 0; i < position && temp->next != head; i++) {
+        temp = temp->next;
+    }
+
+    if (temp == head) {
+        printf("Invalid position\n");
+        return;
+    }
+
+    temp->prev->next = temp->next;
+    temp->next->prev = temp->prev;
+
+    if (temp == tail) {
+        tail = temp->prev;
+    }
+
+    free(temp);
+}
+
+void display() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    struct Node* temp = head;
+    printf("Forward: ");
+    do {
+        printf("%d <-> ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+    printf("(back to head)\n");
+
+    printf("Backward: ");
+    temp = tail;
+    do {
+        printf("%d <-> ", temp->data);
+        temp = temp->prev;
+    } while (temp != tail);
+    printf("(back to tail)\n");
+}
+
+int main() {
+    insertAtEnd(1);
+    insertAtEnd(2);
+    insertAtEnd(3);
+    insertAtEnd(4);
+    insertAtEnd(5);
+    insertAtStart(10);
+    insertAtNPosition(15, 2);
+    display();
+
+    deleteAtFirst();
+    deleteAtEnd();
+    deleteNPosition(2);
+    display();
+
+    return 0;
+}
+'''
+
 def iss_():
     for file,code in iss_codes.items():
         print(file)
@@ -2216,5 +2871,17 @@ def mob_():
         f.write(mob_codes[filename])
         
 
+dsa_codes = {
+    "singly_linked_list.txt": singly_linked_list,
+    "doubly_linked_list.txt": doubly_linked_list,
+    "circular_linked_list.txt": circular_linked_list,
+    "doubly_circular_linked_list.txt": doubly_circular_linked_list
+}
 
-            
+def dsa_():
+    for file,code in dsa_codes.items():
+        print(file)
+    filename = input("Enter filename: ")
+    with open(filename, 'w') as f:
+        f.write(dsa_codes[filename])
+          
